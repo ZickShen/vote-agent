@@ -120,7 +120,7 @@ func main() {
 	var sign string
 	flag.StringVar(&configFile, "c", "", "configuration file")
 	flag.StringVar(&service, "s", "", "service name")
-	flag.StringVar(&sign, "i", "", "count")
+	flag.StringVar(&sign, "i", "", "signature")
 	flag.Parse()
 
 	if service == "" {
@@ -152,11 +152,12 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Sending %d Sphinx packet payloads to: %s@%s\n", sign, serviceDesc.Name, serviceDesc.Provider)
 	vote, err := ioutil.ReadFile(sign)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("Sending [%s] to: %s@%s\n", vote, serviceDesc.Name, serviceDesc.Provider)
 
 	r, err := s.BlockingSendUnreliableMessage(serviceDesc.Name, serviceDesc.Provider, vote)
 	fmt.Printf("response: %s\n", r)
