@@ -20,6 +20,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	mrand "math/rand"
 	"net/url"
 	"strings"
@@ -116,14 +117,18 @@ func register(cfg *config.Config) (*config.Config, *ecdh.PrivateKey) {
 func main() {
 	var configFile string
 	var service string
-	var count int
+	var sign string
 	flag.StringVar(&configFile, "c", "", "configuration file")
 	flag.StringVar(&service, "s", "", "service name")
-	flag.IntVar(&count, "n", 5, "count")
+	flag.StringVar(&sign, "i", "", "count")
 	flag.Parse()
 
 	if service == "" {
 		panic("must specify service name with -s")
+	}
+
+	if sign == "" {
+		panic("must specify signature file with -i")
 	}
 
 	cfg, err := config.LoadFile(configFile)
@@ -147,41 +152,14 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Sending %d Sphinx packet payloads to: %s@%s\n", count, serviceDesc.Name, serviceDesc.Provider)
-	passed := 0
-	failed := 0
-	for i := 0; i < count; i++ {
-		_, err := s.BlockingSendUnreliableMessage(serviceDesc.Name, serviceDesc.Provider, []byte(`Data encryption is used widely to protect the content of Internet
-communications and enables the myriad of activities that are popular today,
-from online banking to chatting with loved ones. However, encryption is not
-sufficient to protect the meta-data associated with the communications.
-
-Modern encrypted communication networks are vulnerable to traffic analysis and
-can leak such meta-data as the social graph of users, their geographical
-location, the timing of messages and their order, message size, and many other
-kinds of meta-data.
-
-Since 1979, there has been active academic research into communication
-meta-data protection, also called anonymous communication networking, that has
-produced various designs. Of these, mix networks are among the most practical
-and can readily scale to millions of users.
-
-The Mix Network workshop will focus on bringing together experts from
-the research and practitioner communities to give technical lectures on key
-Mix networking topics in relation to attacks, defences, and practical
-applications and usage considerations.`))
-		if err != nil {
-			failed++
-			fmt.Printf(".")
-			continue
-		}
-		passed++
-		fmt.Printf("!")
+	fmt.Printf("Sending %d Sphinx packet payloads to: %s@%s\n", sign, serviceDesc.Name, serviceDesc.Provider)
+	vote, err := ioutil.ReadFile(sign)
+	if err != nil {
+		panic(err)
 	}
-	fmt.Printf("\n")
 
-	percent := (float64(passed) * float64(100)) / float64(count)
-	fmt.Printf("Success rate is %f percent %d/%d)\n", percent, passed, count)
+	r, err := s.BlockingSendUnreliableMessage(serviceDesc.Name, serviceDesc.Provider, vote)
+	fmt.Printf("response: %s\n", r)
 
 	c.Shutdown()
 }

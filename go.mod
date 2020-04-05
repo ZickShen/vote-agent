@@ -8,4 +8,6 @@ require (
 	github.com/katzenpost/core v0.0.8-0.20191102182224-0c2d40bb92ac
 	github.com/katzenpost/noise v0.0.0-20191103064950-2fcf628ca336 // indirect
 	github.com/katzenpost/registration_client v0.0.1
+	github.com/katzenpost/server v0.0.8-0.20190910174632-99fb3d5cec86
+	github.com/ugorji/go/codec v1.1.7
 )
