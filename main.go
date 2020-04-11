@@ -157,7 +157,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Sending [%s] to: %s@%s\n", vote, serviceDesc.Name, serviceDesc.Provider)
+	fmt.Printf("Sending vote to: %s@%s\n", serviceDesc.Name, serviceDesc.Provider)
 
 	r, err := s.BlockingSendUnreliableMessage(serviceDesc.Name, serviceDesc.Provider, vote)
 	fmt.Printf("response: %s\n", r)
