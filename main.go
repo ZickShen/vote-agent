@@ -16,9 +16,10 @@
 
 package main
 
+import "C"
+
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	mrand "math/rand"
@@ -114,15 +115,8 @@ func register(cfg *config.Config) (*config.Config, *ecdh.PrivateKey) {
 	return cfg, linkKey
 }
 
-func main() {
-	var configFile string
-	var service string
-	var sign string
-	flag.StringVar(&configFile, "c", "", "configuration file")
-	flag.StringVar(&service, "s", "", "service name")
-	flag.StringVar(&sign, "i", "", "signature")
-	flag.Parse()
-
+//export Vote
+func Vote(configFile, service, sign string) {
 	if service == "" {
 		panic("must specify service name with -s")
 	}
@@ -164,3 +158,5 @@ func main() {
 
 	c.Shutdown()
 }
+
+func main() {}
