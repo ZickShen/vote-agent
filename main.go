@@ -159,4 +159,43 @@ func Vote(configFile, service, sign string) {
 	c.Shutdown()
 }
 
+//export ping
+func ping(configFile, service string) int {
+	if service == "" {
+		panic("must specify service name with -s")
+	}
+
+	cfg, err := config.LoadFile(configFile)
+	if err != nil {
+		panic(err)
+	}
+	cfg, linkKey := register(cfg)
+
+	// create a client and connect to the mixnet Provider
+	c, err := client.New(cfg)
+	if err != nil {
+		return -1
+	}
+	s, err := c.NewSession(linkKey)
+	if err != nil {
+		return -1
+	}
+
+	serviceDesc, err := s.GetService(service)
+	if err != nil {
+		return -1
+	}
+	ping := []byte("ping")
+
+	fmt.Printf("ping...")
+
+	_, err = s.BlockingSendUnreliableMessage(serviceDesc.Name, serviceDesc.Provider, ping)
+	if err != nil {
+		return -1
+	}
+
+	c.Shutdown()
+	return 0
+}
+
 func main() {}
